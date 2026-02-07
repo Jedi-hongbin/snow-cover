@@ -81,13 +81,7 @@ declare module "dat.gui" {
 }
 
 declare module "three/src/scenes/scene" {
-    interface Scene {
-        toggleRoughnessMaterial?: (
-            type: "default" | "base" | "roughness" | "black" | "specular",
-            hideObject?: string[]
-        ) => void;
-        curr: string;
-    }
+   
 }
 
 declare module "three/src/math/box3" {
