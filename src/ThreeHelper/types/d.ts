@@ -35,12 +35,6 @@ declare module "three/src/objects/Mesh" {
     }
 }
 
-declare module "three/src/core/object3D" {
-    // interface Object3DEventMap {
-    //     roughnessMaterial: any;
-    //     prevMaterial: any;
-    // }
-}
 declare module "three/src/materials/ShaderMaterial" {
     interface ShaderMaterial {
         me: "hongbin";
