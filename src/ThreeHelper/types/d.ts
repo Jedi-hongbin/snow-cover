@@ -74,19 +74,6 @@ declare module "dat.gui" {
     }
 }
 
-
-declare module "three/src/math/box3" {
-    // interface Box3 {
-    //     /** ThreeHelper封装getSize重载方法 可以不传递参数 */
-    //     getSize(): Vector3;
-    //     /** ThreeHelper封装getSize重载方法  修复使用call指引this 警告  */
-    //     getSize(...args: any[]): Vector3;
-
-    //     getCenter(): Vector3;
-    //     getCenter(...args: any[]): Vector3;
-    // }
-}
-
 export {};
 // declare namespace ThreeHelper {
 //     let frameHandle: number;
