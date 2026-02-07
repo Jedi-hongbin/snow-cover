@@ -1,0 +1,12 @@
+{
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "notebook.formatOnSave.enabled": true,
+    "editor.inlineSuggest.showToolbar": "always",
+    "liveServer.settings.port": 5502,
+    "cSpell.words": [
+        "fxaa",
+        "moebius",
+        "smaa"
+    ]
+}
