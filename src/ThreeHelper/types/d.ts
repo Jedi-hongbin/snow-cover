@@ -74,9 +74,6 @@ declare module "dat.gui" {
     }
 }
 
-declare module "three/src/scenes/scene" {
-   
-}
 
 declare module "three/src/math/box3" {
     interface Box3 {
