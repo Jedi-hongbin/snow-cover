@@ -34,8 +34,6 @@ export class Effect {
         this.snowCover = new SnowCover(this.helper.scene, this.helper.camera);
         composer.addPass(this.snowCover);
 
-
-
         composer.addPass(new OutputPass());
     }
 
@@ -46,13 +44,27 @@ export class Effect {
     addGui(gui: GUI) {
         const folder = gui.addFolder("Snow Cover");
         folder.open();
-        
+
         const uniforms = this.snowCover.uniforms;
-        
-        folder.add(uniforms.uThreshold, "value", 0, 1).name("Threshold (Coverage)").step(0.01);
+
+        folder
+            .add({ value: 0 }, "value", 0, 1)
+            .name("Threshold (Coverage)")
+            .step(0.01)
+            .onChange((value) => {
+                uniforms.uThreshold.value = 1 - value;
+            });
+
         folder.add(uniforms.uOpacity, "value", 0, 1).name("Opacity").step(0.01);
-        
-        folder.addColor({ color: uniforms.uSnowColor.value.getHex() }, "color")
+        folder.add(uniforms.uRandomStrength, "value", 0, 1).name("Random Strength").step(0.01);
+
+        const dirFolder = folder.addFolder("Snow Direction");
+        dirFolder.add(uniforms.uSnowDirection.value, "x", -1, 1).name("X").step(0.1);
+        dirFolder.add(uniforms.uSnowDirection.value, "y", -1, 1).name("Y").step(0.1);
+        dirFolder.add(uniforms.uSnowDirection.value, "z", -1, 1).name("Z").step(0.1);
+
+        folder
+            .addColor({ color: uniforms.uSnowColor.value.getHex() }, "color")
             .name("Snow Color")
             .onChange((value) => {
                 uniforms.uSnowColor.value.setHex(value);

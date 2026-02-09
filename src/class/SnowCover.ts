@@ -11,7 +11,8 @@ import {
     Color,
     DoubleSide,
     NearestFilter,
-    RGBAFormat
+    RGBAFormat,
+    Vector3
 } from "three";
 import { Pass, FullScreenQuad } from "three/examples/jsm/postprocessing/Pass";
 
@@ -21,7 +22,9 @@ export class SnowCover extends Pass {
         tNormal: { value: Texture | null },
         uSnowColor: { value: Color },
         uThreshold: { value: number },
-        uOpacity: { value: number }
+        uOpacity: { value: number },
+        uSnowDirection: { value: Vector3 },
+        uRandomStrength: { value: number }
     };
     material: ShaderMaterial;
     private _fsQuad: FullScreenQuad;
@@ -73,7 +76,9 @@ export class SnowCover extends Pass {
             tNormal: { value: null },
             uSnowColor: { value: new Color(0xffffff) },
             uThreshold: { value: 1 },
-            uOpacity: { value: 1.0 }
+            uOpacity: { value: 1.0 },
+            uSnowDirection: { value: new Vector3(-0.4, 1.0, 0.2) },
+            uRandomStrength: { value: 0.2 }
         };
 
         /**
@@ -97,6 +102,13 @@ export class SnowCover extends Pass {
                 uniform vec3 uSnowColor;
                 uniform float uThreshold;
                 uniform float uOpacity;
+                uniform vec3 uSnowDirection;
+                uniform float uRandomStrength;
+
+                // Simple pseudo-random function
+                float random(vec2 st) {
+                    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+                }
 
                 void main() {
                     vec4 diffuse = texture2D(tDiffuse, vUv);
@@ -109,9 +121,17 @@ export class SnowCover extends Pass {
                     }
 
                     vec3 normal = normalize(normalData.rgb * 2.0 - 1.0);
+                    vec3 snowDir = normalize(uSnowDirection);
 
-                    // Up vector in world space is (0, 1, 0)
-                    float snowFactor = dot(normal, vec3(0.0, 1.0, 0.0));
+                    // Add some randomness to the snow direction per pixel
+                    // This simulates "random direction" snow accumulation
+                    float noise = random(vUv * 100.0) * 2.0 - 1.0; // -1 to 1
+                    
+                    // Base snow factor based on direction
+                    float snowFactor = dot(normal, snowDir);
+                    
+                    // Apply random influence
+                    snowFactor += noise * uRandomStrength;
 
                     // Smooth transition
                     float s = smoothstep(uThreshold, uThreshold + 0.2, snowFactor);

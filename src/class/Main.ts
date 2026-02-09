@@ -26,6 +26,8 @@ export class Main extends MainScreen {
         cameraPosition: new THREE.Vector3(0, 20, 20),
         cameraTarget: new THREE.Vector3(0, 0, 0),
         useRoomLight: true,
+        near: 0.3,
+        far: 100,
     })
     async init() {
         this._scene = new Scene(this.helper);

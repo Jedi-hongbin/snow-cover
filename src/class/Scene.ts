@@ -17,6 +17,7 @@ export class Scene {
     async loadModel(gltf?: GLTF) {
         if (gltf) {
             this.scene.add(gltf.scene);
+            
             gltf.scene.scale.set(0.1, 0.1, 0.1);
             gltf.scene.position.x += 10;
             gltf.scene.position.z += 10;
