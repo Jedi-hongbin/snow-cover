@@ -131,7 +131,7 @@ export class SnowCover extends Pass {
                     float snowFactor = dot(normal, snowDir);
                     
                     // Apply random influence
-                    snowFactor += noise * uRandomStrength;
+                    snowFactor += noise * uRandomStrength * (1.0 - uThreshold);
 
                     // Smooth transition
                     float s = smoothstep(uThreshold, uThreshold + 0.2, snowFactor);

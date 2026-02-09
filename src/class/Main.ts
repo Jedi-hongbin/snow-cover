@@ -22,7 +22,7 @@ export class Main extends MainScreen {
     }
 
     @MethodBaseSceneSet({
-        addAxis: 10,
+        addAxis: false,
         cameraPosition: new THREE.Vector3(0, 20, 20),
         cameraTarget: new THREE.Vector3(0, 0, 0),
         useRoomLight: true,
