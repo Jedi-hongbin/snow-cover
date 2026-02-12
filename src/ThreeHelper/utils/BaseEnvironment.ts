@@ -330,9 +330,9 @@ export class BaseEnvironment extends ModelsLoad {
     protected initRenderer(parameters: IProps, call: VoidFunction = () => {}) {
         this.renderer = new THREE.WebGLRenderer(parameters);
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-        this.renderer.toneMapping = THREE.NeutralToneMapping;
+        // this.renderer.toneMapping = THREE.NeutralToneMapping;
         // this.renderer.toneMapping = THREE.ReinhardToneMapping;
-        // this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
         // 像素比 分辨率
         // this.renderer.setPixelRatio(layout.pixelRatio);
