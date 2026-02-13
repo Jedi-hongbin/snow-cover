@@ -50,7 +50,10 @@ class List<T> {
         fn.id = List.id || 0;
     }
 
-    forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any) {
+    forEach(
+        callbackfn: (value: T, index: number, array: T[]) => void,
+        thisArg?: any,
+    ) {
         this._list.forEach(callbackfn, thisArg);
     }
 }
@@ -71,6 +74,7 @@ export class ThreeHelper extends BaseEnvironment {
     stats = stats;
     gui?: ReturnType<typeof initGUI>;
     clock = new THREE.Clock();
+    iTime = { value: 0 };
     static instance: ThreeHelper;
     runAnimate = true;
     create = Create;
@@ -96,18 +100,27 @@ export class ThreeHelper extends BaseEnvironment {
             console.log(
                 "%c%s",
                 "background:#71f;border-radius:3px;padding: 2px 4px",
-                "🚀 ThreeHelper Hot overload " + (ThreeHelper.id - 1)
+                "🚀 ThreeHelper Hot overload " + (ThreeHelper.id - 1),
             );
         } else {
-            console.log("%c%s", "background:#51f;border-radius:3px;padding: 2px 4px", "🎉 ThreeHelper init success ");
+            console.log(
+                "%c%s",
+                "background:#51f;border-radius:3px;padding: 2px 4px",
+                "🎉 ThreeHelper init success ",
+            );
         }
 
-        if (ThreeHelper.Loaded && ThreeHelper.instance) return ThreeHelper.instance;
+        if (ThreeHelper.Loaded && ThreeHelper.instance)
+            return ThreeHelper.instance;
 
         ThreeHelper.instance = this;
         ThreeHelper.Loaded = true;
         ThreeHelper.onLoaded.forEach((fn) => fn());
-        Reflect.defineMetadata("inject:class", ThreeHelper.instance, ThreeHelper);
+        Reflect.defineMetadata(
+            "inject:class",
+            ThreeHelper.instance,
+            ThreeHelper,
+        );
 
         window.helper = this;
         window.THREE = THREE;
@@ -165,9 +178,13 @@ export class ThreeHelper extends BaseEnvironment {
             widthSegments?: number;
             heightSegments?: number;
         },
-        parameters?: THREE.MeshStandardMaterialParameters | undefined
+        parameters?: THREE.MeshStandardMaterialParameters | undefined,
     ) {
-        const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
+        const geometry = new THREE.SphereGeometry(
+            radius,
+            widthSegments,
+            heightSegments,
+        );
         const material = new THREE.MeshStandardMaterial(parameters);
         const mesh = new Mesh(geometry, material);
         return mesh;
@@ -178,7 +195,12 @@ export class ThreeHelper extends BaseEnvironment {
      */
     expandBoxTexture(box: Mesh) {
         box.setBoxTexture = (...texts: string[]) => {
-            const materials = texts.map((t) => new THREE.MeshStandardMaterial({ map: this.loadTexture(t) }));
+            const materials = texts.map(
+                (t) =>
+                    new THREE.MeshStandardMaterial({
+                        map: this.loadTexture(t),
+                    }),
+            );
             box.material = materials;
             materials.forEach((m) => {
                 if (m.map) {
@@ -209,6 +231,7 @@ export class ThreeHelper extends BaseEnvironment {
      * 逐帧渲染 frame(帧)
      */
     frameByFrame() {
+        this.iTime.value += this.clock.getDelta();
         this.frameHandle = requestAnimationFrame(() => this.frameByFrame());
         this.controls?.update();
         this.runAnimate && this._animation();
@@ -289,10 +312,11 @@ export class ThreeHelper extends BaseEnvironment {
             skinnedMesh.geometry.clone(),
             skinnedMesh.material && !Array.isArray(skinnedMesh.material)
                 ? skinnedMesh.material.clone()
-                : skinnedMesh.material.map((m) => m.clone())
+                : skinnedMesh.material.map((m) => m.clone()),
         );
         const position = skinnedMesh.geometry.getAttribute("position");
-        const cloneTargetPosition = cloneTarget.geometry.getAttribute("position");
+        const cloneTargetPosition =
+            cloneTarget.geometry.getAttribute("position");
         const cloneTargetNormal = cloneTarget.geometry.getAttribute("normal");
         const normal = skinnedMesh.geometry.getAttribute("normal");
         const skinIndex = skinnedMesh.geometry.getAttribute("skinIndex");
@@ -302,7 +326,9 @@ export class ThreeHelper extends BaseEnvironment {
         const boneTexture = (() => {
             if (!skinnedMesh.skeleton.boneTexture) {
                 skinnedMesh.skeleton.computeBoneTexture();
-                console.warn("应该在渲染一次过后再创建Mesh 手动调用computeBoneTexture创建的骨骼纹理可能无效");
+                console.warn(
+                    "应该在渲染一次过后再创建Mesh 手动调用computeBoneTexture创建的骨骼纹理可能无效",
+                );
             }
             return skinnedMesh.skeleton.boneTexture;
         })();
@@ -312,7 +338,10 @@ export class ThreeHelper extends BaseEnvironment {
         for (let i = 0; i < position.count; i++) {
             const i3 = i * 3;
             const i4 = i * 4;
-            const transformPoint = (i: number, call?: (x: number, y: number, z: number) => void) =>
+            const transformPoint = (
+                i: number,
+                call?: (x: number, y: number, z: number) => void,
+            ) =>
                 this.transformPoint(
                     i,
                     boneTexture,
@@ -323,13 +352,19 @@ export class ThreeHelper extends BaseEnvironment {
                     cloneTargetPosition,
                     cloneTargetNormal,
                     normal,
-                    call
+                    call,
                 );
             transformPoint(i, (x, y, z) => {
                 // @ts-ignore
                 box3.expandByPoint({ x, y, z });
             });
-            this.bindBone(skinnedMesh, cloneTarget, skinIndex.array[i4], i3, transformPoint);
+            this.bindBone(
+                skinnedMesh,
+                cloneTarget,
+                skinIndex.array[i4],
+                i3,
+                transformPoint,
+            );
         }
         // cloneTarget.add(new THREE.Box3Helper(box3))
 
@@ -355,47 +390,76 @@ export class ThreeHelper extends BaseEnvironment {
         skinIndex: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
         skinWeight: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
         skinnedMesh: THREE.SkinnedMesh,
-        cloneTargetPosition: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
-        cloneTargetNormal: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
+        cloneTargetPosition:
+            | THREE.BufferAttribute
+            | THREE.InterleavedBufferAttribute,
+        cloneTargetNormal:
+            | THREE.BufferAttribute
+            | THREE.InterleavedBufferAttribute,
         normal: THREE.BufferAttribute | THREE.InterleavedBufferAttribute,
-        call?: (x: number, y: number, z: number) => void
+        call?: (x: number, y: number, z: number) => void,
     ) {
         const i3 = i * 3;
         const i4 = i * 4;
-        const coord = new THREE.Vector4(position.array[i3], position.array[i3 + 1], position.array[i3 + 2], 1);
+        const coord = new THREE.Vector4(
+            position.array[i3],
+            position.array[i3 + 1],
+            position.array[i3 + 2],
+            1,
+        );
 
         const boneMatX = this.getBoneMatrix(boneTexture, skinIndex.array[i4]);
-        const boneMatY = this.getBoneMatrix(boneTexture, skinIndex.array[i4 + 1]);
-        const boneMatZ = this.getBoneMatrix(boneTexture, skinIndex.array[i4 + 2]);
-        const boneMatW = this.getBoneMatrix(boneTexture, skinIndex.array[i4 + 3]);
+        const boneMatY = this.getBoneMatrix(
+            boneTexture,
+            skinIndex.array[i4 + 1],
+        );
+        const boneMatZ = this.getBoneMatrix(
+            boneTexture,
+            skinIndex.array[i4 + 2],
+        );
+        const boneMatW = this.getBoneMatrix(
+            boneTexture,
+            skinIndex.array[i4 + 3],
+        );
 
         const skinVertex = coord.applyMatrix4(skinnedMesh.bindMatrix);
         const skinned = new THREE.Vector4();
-        skinned.addVectors(skinned, skinVertex.clone().applyMatrix4(boneMatX).multiplyScalar(skinWeight.array[i4]));
+        skinned.addVectors(
+            skinned,
+            skinVertex
+                .clone()
+                .applyMatrix4(boneMatX)
+                .multiplyScalar(skinWeight.array[i4]),
+        );
         skinned.addVectors(
             skinned,
             skinVertex
                 .clone()
                 .applyMatrix4(boneMatY)
-                .multiplyScalar(skinWeight.array[i4 + 1])
+                .multiplyScalar(skinWeight.array[i4 + 1]),
         );
         skinned.addVectors(
             skinned,
             skinVertex
                 .clone()
                 .applyMatrix4(boneMatZ)
-                .multiplyScalar(skinWeight.array[i4 + 2])
+                .multiplyScalar(skinWeight.array[i4 + 2]),
         );
         skinned.addVectors(
             skinned,
             skinVertex
                 .clone()
                 .applyMatrix4(boneMatW)
-                .multiplyScalar(skinWeight.array[i4 + 3])
+                .multiplyScalar(skinWeight.array[i4 + 3]),
         );
         // transformed = ( bindMatrixInverse * skinned ).xyz;
         const transformed = skinned.applyMatrix4(skinnedMesh.bindMatrixInverse);
-        cloneTargetPosition.setXYZ(i, transformed.x, transformed.y, transformed.z);
+        cloneTargetPosition.setXYZ(
+            i,
+            transformed.x,
+            transformed.y,
+            transformed.z,
+        );
         call && call(transformed.x, transformed.y, transformed.z);
         const skinMatrix = new THREE.Matrix4().multiplyScalar(0);
         boneMatX.multiplyScalar(skinWeight.array[i4]);
@@ -406,8 +470,15 @@ export class ThreeHelper extends BaseEnvironment {
         this.MatrixAdd(skinMatrix, boneMatZ);
         boneMatW.multiplyScalar(skinWeight.array[i4 + 3]);
         this.MatrixAdd(skinMatrix, boneMatW);
-        const m4 = skinnedMesh.bindMatrix.clone().multiply(skinMatrix).multiply(skinnedMesh.bindMatrixInverse);
-        const objectNormal = new THREE.Vector3(normal.array[i3], normal.array[i3 + 1], normal.array[i3 + 2]);
+        const m4 = skinnedMesh.bindMatrix
+            .clone()
+            .multiply(skinMatrix)
+            .multiply(skinnedMesh.bindMatrixInverse);
+        const objectNormal = new THREE.Vector3(
+            normal.array[i3],
+            normal.array[i3 + 1],
+            normal.array[i3 + 2],
+        );
         objectNormal.applyMatrix4(m4);
         cloneTargetNormal.array[i3] = objectNormal.x;
         cloneTargetNormal.array[i3 + 1] = objectNormal.y;
@@ -416,7 +487,10 @@ export class ThreeHelper extends BaseEnvironment {
 
     getBoneMatrix(boneTexture: THREE.Texture, index: number) {
         // 可以简化成这一行
-        return new THREE.Matrix4().fromArray(boneTexture.source.data.data, index * 16);
+        return new THREE.Matrix4().fromArray(
+            boneTexture.source.data.data,
+            index * 16,
+        );
 
         //下面是模拟shder的计算
         // const size = boneTexture!.source.data.width;
@@ -461,25 +535,33 @@ export class ThreeHelper extends BaseEnvironment {
         cloneTarget: THREE.Mesh,
         boneIndex: number,
         positionIndex: number,
-        transformPoint: (i: number, call?: (x: number, y: number, z: number) => void) => void
+        transformPoint: (
+            i: number,
+            call?: (x: number, y: number, z: number) => void,
+        ) => void,
     ) {
         const bone = skinnedMesh.skeleton.bones[boneIndex];
 
         if (bone) {
-            bone.userData.bindPosition = [...(bone.userData.bindPosition || []), positionIndex];
+            bone.userData.bindPosition = [
+                ...(bone.userData.bindPosition || []),
+                positionIndex,
+            ];
             if (!bone.userData.updateTemplatePosition) {
                 bone.userData.updateTemplatePosition = () => {
                     bone.traverse((b) => {
-                        ((b.userData.bindPosition as number[]) || []).forEach((i3) => {
-                            const i = i3 / 3;
-                            if (!/\./.test("" + i))
-                                transformPoint(i, (x, y, z) => {
-                                    cloneTarget.geometry.boundingBox?.expandByPoint(
-                                        // @ts-ignore
-                                        { x, y, z }
-                                    );
-                                });
-                        });
+                        ((b.userData.bindPosition as number[]) || []).forEach(
+                            (i3) => {
+                                const i = i3 / 3;
+                                if (!/\./.test("" + i))
+                                    transformPoint(i, (x, y, z) => {
+                                        cloneTarget.geometry.boundingBox?.expandByPoint(
+                                            // @ts-ignore
+                                            { x, y, z },
+                                        );
+                                    });
+                            },
+                        );
                     });
 
                     this.updateAttr(cloneTarget, "position");

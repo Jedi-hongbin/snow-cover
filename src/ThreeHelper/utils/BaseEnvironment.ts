@@ -133,7 +133,7 @@ export class BaseEnvironment extends ModelsLoad {
         // );
 
         /** WebGPU 设置背景 似乎必须加载完纹理 而不是promise */
-        this.scene.background = textureCube;
+        // this.scene.background = textureCube;
         return textureCube;
     }
 

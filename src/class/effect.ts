@@ -11,9 +11,9 @@ import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPa
 export class Effect {
     private composer!: EffectComposer;
     params = {
-        threshold: 0.23,
-        strength: 0.21,
-        radius: 0.54,
+        threshold: 0.17,
+        strength: 0.75,
+        radius: 0.39,
     };
     private bloomPass!: UnrealBloomPass;
 
