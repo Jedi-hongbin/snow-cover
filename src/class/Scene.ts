@@ -75,8 +75,8 @@ export class Scene {
 
             const bgLine = [
                 { name: "平面001", opacity: 1 },
-                { name: "平面002", opacity: 0.4 },
-                { name: "平面003", opacity: 0.3 },
+                { name: "平面002", opacity: 0.2 },
+                { name: "平面003", opacity: 0.1 },
             ];
 
             bgLine.forEach((item) => {
