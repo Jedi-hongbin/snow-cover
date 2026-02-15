@@ -4,15 +4,14 @@ import { ThreeHelper } from "../ThreeHelper";
 export class GridMaterial extends THREE.ShaderMaterial {
     constructor(map: THREE.Texture | null, opacity: number) {
         super({
-            uniforms: THREE.UniformsUtils.merge([
-                THREE.UniformsLib['fog'],
-                {
-                    color: { value: new THREE.Color(0xffffff) },
-                    map: { value: map },
-                    opacity: { value: opacity },
-                    iTime: ThreeHelper.instance.iTime,
-                }
-            ]),
+            uniforms: {
+                ...THREE.UniformsLib["fog"],
+                color: { value: new THREE.Color(0xffffff) },
+                map: { value: map },
+                opacity: { value: opacity },
+                // 使用merge方法会进行拷贝 iTime失效不会随着时间变化
+                iTime: ThreeHelper.instance.iTime,
+            },
             vertexShader: /*glsl*/ `
                 #include <fog_pars_vertex>
                 varying vec2 vUv;
@@ -39,15 +38,16 @@ export class GridMaterial extends THREE.ShaderMaterial {
                     float dist = distance(vUv, vec2(0.5));
                     // Create expanding rings
                     // pow(dist, 0.5) makes the rings narrower at the center and wider at the edges
-                    float spread = fract(pow(dist,.5) * 2.0 - iTime * 0.2);
+                    float spread = fract(pow(dist,.3) * 1.0 - iTime * 0.25);
                     // Create a smooth wave form for the ring
                     float a = sin(spread * 3.14159);
                     // Fade out towards the edges
-                    a *= (1.0 - smoothstep(0.0, 0.5, dist));
+                    // a *= (1.0 - smoothstep(0.0, 0.5, dist));
 
                     textureColor.rgb = mix(textureColor.rgb,vec3(0.5,0.1,1.),(a));
 
-                    gl_FragColor = vec4(color, opacity + a*0.8) * textureColor; 
+                    gl_FragColor = vec4(color, opacity + a) * textureColor; 
+                    
                     #include <fog_fragment>
                 }
             `,
