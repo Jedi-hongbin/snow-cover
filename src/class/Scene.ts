@@ -4,8 +4,10 @@ import { LoadGLTF } from "../ThreeHelper/decorators";
 import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import { GUI } from "dat.gui";
 import { GridMaterial } from "./GridMaterial";
+import { LineMaterial } from "./LineMaterial";
+import { FloorMaterial } from "./FloorMaterial";
 
-type BasicMesh = THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial >;
+type BasicMesh = THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
 
 export class Scene {
     scene = new THREE.Group();
@@ -74,9 +76,11 @@ export class Scene {
             });
 
             const bgLine = [
+                { name: "平面", opacity: 1 },
                 { name: "平面001", opacity: 1 },
                 { name: "平面002", opacity: 0.2 },
                 { name: "平面003", opacity: 0.1 },
+                { name: "平面004", opacity: 1 },
             ];
 
             bgLine.forEach((item) => {
@@ -85,21 +89,45 @@ export class Scene {
                 if (plane) {
                     plane.castShadow = false;
                     plane.receiveShadow = false;
-                }
 
-                const planeMaterialMap = plane.material.map;
+                    const planeMaterialMap = plane.material.map!;
 
-                if (item.name == "平面003") {
-                    // @ts-ignore
-                    plane.material = new GridMaterial(planeMaterialMap, item.opacity);
-                } else {
-                    // 替换basic材质
-                    plane.material = new THREE.MeshBasicMaterial({
-                        color: 0xffffff,
-                        transparent: true,
-                        map: planeMaterialMap,
-                        opacity: item.opacity,
-                    });
+                    planeMaterialMap.wrapS = THREE.RepeatWrapping;
+                    planeMaterialMap.wrapT = THREE.RepeatWrapping;
+                    planeMaterialMap.repeat.set(10, 10);
+
+                    if (item.name == "平面") {
+                        // @ts-ignore
+                        plane.material = new FloorMaterial(planeMaterialMap, item.opacity);
+                    } else if (item.name == "平面003") {
+                        planeMaterialMap.repeat.set(10, 10);
+
+                        // @ts-ignore
+                        plane.material = new GridMaterial(planeMaterialMap, item.opacity);
+                        // const planeClone = new THREE.Mesh(
+                        //     plane.geometry,
+                        //     new THREE.MeshBasicMaterial({
+                        //         color: 0xffffff,
+                        //         transparent: true,
+                        //         map: planeMaterialMap,
+                        //         opacity: item.opacity,
+                        //         side: 2,
+                        //     }),
+                        // );
+                        // plane.add(planeClone);
+                        // planeClone.position.z -= 0.02;
+                    } else if (item.name == "平面004") {
+                        // @ts-ignore
+                        plane.material = new LineMaterial(planeMaterialMap, item.opacity);
+                    } else {
+                        // 替换basic材质
+                        plane.material = new THREE.MeshBasicMaterial({
+                            color: 0xffffff,
+                            transparent: true,
+                            map: planeMaterialMap,
+                            opacity: item.opacity,
+                        });
+                    }
                 }
             });
 
