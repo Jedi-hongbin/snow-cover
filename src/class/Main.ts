@@ -23,19 +23,24 @@ export class Main extends MainScreen {
 
     @MethodBaseSceneSet({
         addAxis: false,
-        cameraPosition: new THREE.Vector3(0, 20, 20),
+        cameraPosition: new THREE.Vector3(0, 20, 25),
         cameraTarget: new THREE.Vector3(0, 0, 0),
-        useRoomLight: true,
+        useRoomLight: false,
         near: 0.3,
-        far: 100,
+        far: 500,
     })
     async init() {
-        this._scene = new Scene(this.helper);
-        this.helper.add(this._scene.scene);
         this.helper.renderer.setPixelRatio(2);
 
+        this._scene = new Scene(this.helper);
         // 创建后期渲染
-        this._effect = new Effect(this.helper);
+        this._effect = new Effect(this.helper, this._scene);
+
+        const CubeTexture = await this.helper.setBackgroundHDR("/public/env/Standard-Cube-Map2/");
+
+        this.helper.scene.environment = CubeTexture;
+
+        this.helper.add(this._scene.scene);
 
         this.helper.render = () => {
             this._effect.render();
@@ -49,6 +54,7 @@ export class Main extends MainScreen {
     Gui(gui: GUI) {
         if (gui) {
             this._effect?.addGui(gui);
+            this._scene?.addGUI(gui);
         }
     }
 }

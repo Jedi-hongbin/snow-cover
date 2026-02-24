@@ -133,7 +133,7 @@ export class BaseEnvironment extends ModelsLoad {
         // );
 
         /** WebGPU 设置背景 似乎必须加载完纹理 而不是promise */
-        this.scene.background = textureCube;
+        // this.scene.background = textureCube;
         return textureCube;
     }
 
@@ -330,9 +330,9 @@ export class BaseEnvironment extends ModelsLoad {
     protected initRenderer(parameters: IProps, call: VoidFunction = () => {}) {
         this.renderer = new THREE.WebGLRenderer(parameters);
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-        this.renderer.toneMapping = THREE.NeutralToneMapping;
+        // this.renderer.toneMapping = THREE.NeutralToneMapping;
         // this.renderer.toneMapping = THREE.ReinhardToneMapping;
-        // this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
         // 像素比 分辨率
         // this.renderer.setPixelRatio(layout.pixelRatio);

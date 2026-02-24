@@ -37,7 +37,7 @@ const Canvas: FC<IProps> = ({ main, style }) => {
             const cleanup: VoidFunction[] = [];
 
             const helper = new ThreeHelper({
-                antialias: true,
+                antialias: false,
                 canvas: ref.current,
             });
 
