@@ -55,7 +55,7 @@ export class GridMaterial extends THREE.ShaderMaterial {
 
                     // if(gl_FragColor.a < .15) discard;
                     if(gl_FragColor.a < .15) {
-                        gl_FragColor.rgb = vec3(0.1);
+                        gl_FragColor.rgb = vec3(0.);
                     };
                 }
             `,

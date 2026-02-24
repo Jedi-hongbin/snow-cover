@@ -49,7 +49,7 @@ export class FloorMaterial extends THREE.ShaderMaterial {
                     // a *= (1.0 - smoothstep(0.0, 0.5, dist));
 
                     // textureColor.rgb = mix(textureColor.rgb,vec3(0.8,0.4,1.),pow(a,2.5));
-                    textureColor.rgb *= (1.0-a) / 2.;
+                    textureColor.rgb *= max(0.1,( 1.0 - a ) / 2.);
 
                     gl_FragColor = vec4(color, 1.) * textureColor; 
 

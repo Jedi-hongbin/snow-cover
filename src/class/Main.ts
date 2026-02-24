@@ -34,7 +34,7 @@ export class Main extends MainScreen {
 
         this._scene = new Scene(this.helper);
         // 创建后期渲染
-        this._effect = new Effect(this.helper);
+        this._effect = new Effect(this.helper, this._scene);
 
         const CubeTexture = await this.helper.setBackgroundHDR("/public/env/Standard-Cube-Map2/");
 

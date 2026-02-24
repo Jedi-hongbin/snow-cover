@@ -6,6 +6,7 @@ import { GUI } from "dat.gui";
 import { GridMaterial } from "./GridMaterial";
 import { LineMaterial } from "./LineMaterial";
 import { FloorMaterial } from "./FloorMaterial";
+import EventMesh from "../ThreeHelper/decorators/EventMesh";
 
 type BasicMesh = THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
 
@@ -27,16 +28,18 @@ export class Scene {
         THREE.Object3DEventMap
     >;
 
+    selectedObjects: THREE.Mesh[] = [];
+
     constructor(private helper: ThreeHelper) {
         Scene.instance = this;
 
         // 开启阴影
-        this.helper.renderer.shadowMap.enabled = true;
+        // this.helper.renderer.shadowMap.enabled = true;
         // 阴影类型
-        this.helper.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        // this.helper.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
         // 雾化
-        this.helper.scene.fog = new THREE.FogExp2(0x111111, 0.01);
+        this.helper.scene.fog = new THREE.FogExp2(0x111111, 0.02);
         this.helper.scene.background = new THREE.Color(0x111111);
 
         this.loadModel();
@@ -55,7 +58,7 @@ export class Scene {
             this.scene.add(spotLight);
 
             //阴影
-            spotLight.castShadow = true;
+            // spotLight.castShadow = true;
             // 阴影贴图分辨率
             spotLight.shadow.mapSize.set(1024, 1024);
             // 阴影贴图模糊度
@@ -69,8 +72,8 @@ export class Scene {
                 if (child instanceof THREE.Mesh) {
                     // 材质name不包含glass
                     if (!child.material.name.includes("glass")) {
-                        child.castShadow = true;
-                        child.receiveShadow = true;
+                        // child.castShadow = true;
+                        // child.receiveShadow = true;
                     }
                 }
             });
@@ -131,6 +134,15 @@ export class Scene {
                 }
             });
 
+            //wrap-
+            const wrapPlane = gltf.scene.children.filter((x) => x.name.includes("wrap-")) as BasicMesh[];
+
+            wrapPlane.forEach((x) => {
+                x.visible = false;
+            });
+
+            EventMesh.setIntersectObjects(wrapPlane);
+
             //围墙
             const wall = gltf.scene.getObjectByName("围墙") as BasicMesh;
 
@@ -162,6 +174,22 @@ export class Scene {
             window4.material = wall2.material;
         }
     }
+
+    // @EventMesh.OnMouseDown(Scene)
+    // onMouseDown() {
+    //     if (EventMesh.RayInfo?.object) {
+    //         const targetName = EventMesh.RayInfo?.object.userData.prop.name;
+
+    //         if (targetName) {
+    //             const target = this.scene.getObjectByName(targetName.replace(".", "")) as BasicMesh;
+
+    //             if (target) {
+    //                 this.selectedObjects.length = 0;
+    //                 this.selectedObjects.push(target);
+    //             }
+    //         }
+    //     }
+    // }
 
     addGUI(gui: GUI) {
         if (gui) {

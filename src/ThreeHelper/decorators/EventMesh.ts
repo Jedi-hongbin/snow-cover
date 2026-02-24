@@ -72,7 +72,7 @@ class EventMesh {
     private static raycaster = new Raycaster();
     private static pointer = new Vector2();
     private static calls = new MyMap<MyMap<ListenCallback>>();
-    private static raycasterMesh: Object3D[];
+    static raycasterMesh: Object3D[];
     private static isInit = new MyMap<boolean>();
     public static absoluteOffsetLeft = 0;
     static RayInfo?: BackIntersection & {};
@@ -118,7 +118,7 @@ class EventMesh {
 
         const intersects = EventMesh.raycaster.intersectObjects(
             EventMesh.raycasterMesh || ThreeHelper.instance.scene.children,
-            true
+            false
         );
 
         EventMesh.RayInfo = {
